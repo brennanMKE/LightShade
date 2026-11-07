@@ -1,0 +1,219 @@
+<title>Jewel Lattice Shade</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: viewer stage on the left, spec sheet on the right; stacks on phones */
+:root {
+  --bg: #f0efec; --panel: #ffffff; --fg: #1f1d1a; --muted: #66615a; --line: #dcd8d1;
+  --accent: #b5641c; --stage: #e4e1db;
+  --t-thin: #fff1d6; --t-mid: #c9a46a; --t-thick: #5c4a33;
+  --display: "Chakra Petch", "Avenir Next", system-ui, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #13120f; --panel: #1b1916; --fg: #ece8e1; --muted: #a29b90; --line: #2f2b26;
+  --accent: #f0a050; --stage: #0c0b09; --t-thin: #fff1d6; --t-mid: #b08a52; --t-thick: #4a3b28; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #13120f; --panel: #1b1916; --fg: #ece8e1; --muted: #a29b90; --line: #2f2b26;
+  --accent: #f0a050; --stage: #0c0b09; --t-thin: #fff1d6; --t-mid: #b08a52; --t-thick: #4a3b28; color-scheme: dark }
+body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 15px; line-height: 1.5; }
+.wrap { max-width: 1200px; margin: 0 auto; padding-block: 24px 40px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 20px; }
+h1 { font-family: var(--display); font-weight: 600; font-size: clamp(26px, 4vw, 38px); margin: 0; letter-spacing: .01em; text-wrap: balance; }
+.sub { color: var(--muted); margin: 0; max-width: 70ch; }
+.grid { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 20px; align-items: start; }
+@media (max-width: 860px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+.stage { position: relative; background: var(--stage); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; aspect-ratio: 4 / 3.6; max-width: 100%; }
+.stage canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+.hint { position: absolute; left: 12px; bottom: 10px; font: 12px var(--mono); color: var(--muted); pointer-events: none; }
+.controls { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: center; }
+.group { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.label { font: 500 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-right: 4px; }
+button.seg { font: 500 13px var(--body); color: var(--fg); background: var(--panel); border: 1px solid var(--line); padding: 6px 12px; border-radius: 6px; cursor: pointer; }
+button.seg[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+button.sw { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--line); cursor: pointer; padding: 0; }
+button.sw[aria-pressed="true"] { border-color: var(--fg); }
+button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+aside { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 18px 18px 8px; min-width: 0; }
+aside h2 { font: 600 15px var(--display); letter-spacing: .04em; text-transform: uppercase; margin: 0 0 10px; }
+dl { display: grid; grid-template-columns: 1fr auto; gap: 7px 12px; margin: 0 0 18px; }
+dt { color: var(--muted); }
+dd { margin: 0; font-family: var(--mono); font-variant-numeric: tabular-nums; text-align: right; }
+.tones { display: grid; gap: 8px; margin: 0 0 18px; padding: 0; list-style: none; }
+.tones li { display: grid; grid-template-columns: 22px 1fr auto; gap: 10px; align-items: center; }
+.chip { width: 22px; height: 22px; border-radius: 4px; border: 1px solid var(--line); }
+.tones .mm { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.notes { margin: 0 0 14px; padding-left: 18px; }
+.notes li { margin-bottom: 6px; }
+.files { font-family: var(--mono); font-size: 12.5px; color: var(--muted); word-break: break-all; }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Jewel Lattice Shade</h1>
+    <p class="sub">A 6-inch cylinder for the same 82.19 mm light ring. A diamond lattice is cut into the wall at three depths, so the light comes through in bright windows, mid-tone jewels and dark ribs.</p>
+  </header>
+
+  <div class="grid">
+    <div style="display:grid; gap:14px; min-width:0">
+      <div class="stage" id="stage"><span class="hint">drag to orbit · scroll / pinch to zoom</span></div>
+      <div class="controls">
+        <div class="group" role="group" aria-label="Lighting">
+          <span class="label">Light</span>
+          <button class="seg" id="mode-studio" aria-pressed="false">Studio</button>
+          <button class="seg" id="mode-glow" aria-pressed="true">Lit</button>
+        </div>
+        <div class="group" role="group" aria-label="LED colour">
+          <span class="label">LED</span>
+          <button class="sw" id="led-warm" style="background:#ffc983" aria-label="Warm white" aria-pressed="true"></button>
+          <button class="sw" id="led-blue" style="background:#3d6bff" aria-label="Blue" aria-pressed="false"></button>
+          <button class="sw" id="led-green" style="background:#2fe08a" aria-label="Green" aria-pressed="false"></button>
+          <button class="sw" id="led-magenta" style="background:#ff4fd2" aria-label="Magenta" aria-pressed="false"></button>
+        </div>
+        <div class="group" role="group" aria-label="View">
+          <span class="label">View</span>
+          <button class="seg" id="tog-section" aria-pressed="false">Section</button>
+          <button class="seg" id="tog-base" aria-pressed="true">Base ring</button>
+          <button class="seg" id="tog-spin" aria-pressed="true">Spin</button>
+        </div>
+      </div>
+    </div>
+
+    <aside>
+      <h2>Light levels</h2>
+      <ul class="tones">
+        <li><span class="chip" style="background:var(--t-thin)"></span><span>Windows</span><span class="mm">0.8 mm</span></li>
+        <li><span class="chip" style="background:var(--t-mid)"></span><span>Jewel frames</span><span class="mm">2.0 mm</span></li>
+        <li><span class="chip" style="background:var(--t-thick)"></span><span>Ribs, collar, rim</span><span class="mm">3.0 mm</span></li>
+      </ul>
+      <h2>Fit</h2>
+      <dl>
+        <dt>Light ring OD (measured)</dt><dd>82.19 mm</dd>
+        <dt>Shade bore (ID)</dt><dd>84.0 mm</dd>
+        <dt>Outside diameter</dt><dd>90.0 mm</dd>
+        <dt>Solid collar / rim</dt><dd>10 / 6 mm</dd>
+      </dl>
+      <h2>Size</h2>
+      <dl>
+        <dt>Height</dt><dd>152.4 mm (6.00 in)</dd>
+        <dt>Diamonds</dt><dd>16 around × 10 rows</dd>
+        <dt>Cell size</dt><dd>17.7 × 24 mm</dd>
+        <dt>Jewels / plain windows</dt><dd>96 / 64</dd>
+        <dt>Rib width</dt><dd>2.2 mm</dd>
+        <dt>Volume / PLA mass</dt><dd>84.3 cm³ · ~105 g</dd>
+      </dl>
+      <h2>Printing</h2>
+      <ul class="notes">
+        <li>Print upright, collar on the bed. No supports: every pocket ends in a sloped diamond tip, and the printability check found no overhangs.</li>
+        <li>White or natural PLA. Use a 0.4 mm nozzle so each window is exactly 2 perimeters.</li>
+      </ul>
+      <p class="files">cad/lattice_cylinder.py<br>out/lattice_cylinder.stl · .3mf · .step</p>
+    </aside>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/STLLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+const STL_B64 = "__STL_B64__";
+const BORE_R = 42.0;   // mm; wall thickness at a point = radius - BORE_R
+(function () {
+  const stage = document.getElementById('stage');
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.localClippingEnabled = true;
+  stage.appendChild(renderer.domElement);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(35, 1, 1, 2000);
+  camera.position.set(250, 170, 250);
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.target.set(0, 72, 0);
+  controls.enableDamping = true;
+  controls.minDistance = 140; controls.maxDistance = 700;
+
+  const hemi = new THREE.HemisphereLight(0xffffff, 0x554433, 0.75);
+  const key = new THREE.DirectionalLight(0xffffff, 0.8); key.position.set(150, 250, 120);
+  const rim = new THREE.DirectionalLight(0xffffff, 0.35); rim.position.set(-200, 80, -150);
+  scene.add(hemi, key, rim);
+
+  const bin = atob(STL_B64); const buf = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+  const geom = new THREE.STLLoader().parse(buf.buffer);
+  geom.rotateX(-Math.PI / 2);          // CAD Z-up -> three Y-up
+  geom.computeVertexNormals();
+
+  // Approximate transmission from wall thickness: light falls off exponentially through PLA.
+  const pos = geom.attributes.position, nrm = geom.attributes.normal;
+  const shadeAttr = new Float32Array(pos.count * 3);
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i), z = pos.getZ(i);
+    const r = Math.hypot(x, z);
+    const inward = (nrm.getX(i) * x + nrm.getZ(i) * z) / (r || 1) < -0.5;
+    const t = Math.min(Math.max(r - BORE_R, 0.8), 3.0);
+    const T = inward ? 0.85 : Math.exp(-0.85 * (t - 0.8));
+    shadeAttr[i * 3] = shadeAttr[i * 3 + 1] = shadeAttr[i * 3 + 2] = 0.04 + 0.96 * T;
+  }
+  geom.setAttribute('color', new THREE.BufferAttribute(shadeAttr, 3));
+
+  const clip = new THREE.Plane(new THREE.Vector3(0, 0, -1), 0);
+  const studioMat = new THREE.MeshStandardMaterial({ color: 0xf3efe6, roughness: 0.75, side: THREE.DoubleSide });
+  const glowMat = new THREE.MeshBasicMaterial({ vertexColors: true, color: 0xffc983, side: THREE.DoubleSide });
+  const shade = new THREE.Mesh(geom, glowMat);
+  scene.add(shade);
+
+  const base = new THREE.Group();
+  const black = new THREE.Mesh(new THREE.CylinderGeometry(66, 66, 4, 96),
+    new THREE.MeshStandardMaterial({ color: 0x15171a, roughness: 0.35 }));
+  black.position.y = -2;
+  const chrome = new THREE.Mesh(new THREE.CylinderGeometry(41.1, 41.1, 9, 96, 1, true),
+    new THREE.MeshStandardMaterial({ color: 0xb9c2cc, metalness: 0.9, roughness: 0.25, side: THREE.DoubleSide }));
+  chrome.position.y = 4.5;
+  base.add(black, chrome);
+  scene.add(base);
+
+  let glow = true, spin = true;
+  function applyLight() {
+    shade.material = glow ? glowMat : studioMat;
+    stage.style.background = glow ? '#07060a' : '';
+  }
+  applyLight();
+
+  function press(id, on) { document.getElementById(id).setAttribute('aria-pressed', String(on)); }
+  document.getElementById('mode-studio').onclick = () => { glow = false; press('mode-studio', true); press('mode-glow', false); applyLight(); };
+  document.getElementById('mode-glow').onclick = () => { glow = true; press('mode-studio', false); press('mode-glow', true); applyLight(); };
+  const leds = { 'led-warm': 0xffc983, 'led-blue': 0x5a82ff, 'led-green': 0x2fe08a, 'led-magenta': 0xff4fd2 };
+  Object.keys(leds).forEach(id => document.getElementById(id).onclick = () => {
+    glowMat.color.setHex(leds[id]); Object.keys(leds).forEach(o => press(o, o === id));
+    if (!glow) { glow = true; press('mode-studio', false); press('mode-glow', true); }
+    applyLight();
+  });
+  document.getElementById('tog-section').onclick = (e) => {
+    const on = e.currentTarget.getAttribute('aria-pressed') !== 'true'; press('tog-section', on);
+    [studioMat, glowMat].forEach(m => { m.clippingPlanes = on ? [clip] : []; m.needsUpdate = true; });
+  };
+  document.getElementById('tog-base').onclick = (e) => {
+    const on = e.currentTarget.getAttribute('aria-pressed') !== 'true'; press('tog-base', on); base.visible = on;
+  };
+  document.getElementById('tog-spin').onclick = (e) => {
+    spin = e.currentTarget.getAttribute('aria-pressed') !== 'true'; press('tog-spin', spin);
+  };
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { spin = false; press('tog-spin', false); }
+  controls.addEventListener('start', () => { spin = false; press('tog-spin', false); });
+
+  function resize() {
+    const w = stage.clientWidth, h = stage.clientHeight;
+    renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
+  }
+  new ResizeObserver(resize).observe(stage); resize();
+
+  (function loop() {
+    if (spin) shade.rotation.y += 0.003;
+    controls.update(); renderer.render(scene, camera); requestAnimationFrame(loop);
+  })();
+})();
+</script>

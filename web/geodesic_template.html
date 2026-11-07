@@ -1,0 +1,215 @@
+<title>Geodesic Ring Shade</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: viewer stage on the left, spec sheet on the right; stacks on phones */
+:root {
+  --bg: #eef0f2; --panel: #ffffff; --fg: #1b2026; --muted: #5d6874; --line: #d5dbe1;
+  --accent: #2f6fd6; --stage: #dfe4ea;
+  --display: "Chakra Petch", "Avenir Next", system-ui, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #101418; --panel: #171c22; --fg: #e6ebf0; --muted: #93a0ad; --line: #2a323b;
+  --accent: #6ea4ff; --stage: #0b0e11; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #101418; --panel: #171c22; --fg: #e6ebf0; --muted: #93a0ad; --line: #2a323b;
+  --accent: #6ea4ff; --stage: #0b0e11; color-scheme: dark }
+body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 15px; line-height: 1.5; }
+.wrap { max-width: 1200px; margin: 0 auto; padding-block: 24px 40px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 20px; }
+header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 20px; }
+h1 { font-family: var(--display); font-weight: 600; font-size: clamp(26px, 4vw, 38px); margin: 0; letter-spacing: .01em; text-wrap: balance; }
+.sub { color: var(--muted); margin: 0; }
+.grid { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 20px; align-items: start; }
+@media (max-width: 860px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+.stage { position: relative; background: var(--stage); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; aspect-ratio: 4 / 3.4; max-width: 100%; }
+.stage canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+.hint { position: absolute; left: 12px; bottom: 10px; font: 12px var(--mono); color: var(--muted); pointer-events: none; }
+.controls { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: center; }
+.group { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.label { font: 500 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-right: 4px; }
+button.seg { font: 500 13px var(--body); color: var(--fg); background: var(--panel); border: 1px solid var(--line); padding: 6px 12px; border-radius: 6px; cursor: pointer; }
+button.seg[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+button.sw { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--line); cursor: pointer; padding: 0; }
+button.sw[aria-pressed="true"] { border-color: var(--fg); }
+button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+aside { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 18px 18px 8px; min-width: 0; }
+aside h2 { font: 600 15px var(--display); letter-spacing: .04em; text-transform: uppercase; margin: 0 0 10px; }
+dl { display: grid; grid-template-columns: 1fr auto; gap: 7px 12px; margin: 0 0 18px; }
+dt { color: var(--muted); }
+dd { margin: 0; font-family: var(--mono); font-variant-numeric: tabular-nums; text-align: right; }
+.notes { margin: 0 0 14px; padding-left: 18px; color: var(--fg); }
+.notes li { margin-bottom: 6px; }
+code { font-family: var(--mono); font-size: 13px; }
+.files { font-family: var(--mono); font-size: 12.5px; color: var(--muted); word-break: break-all; }
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Geodesic Ring Shade</h1>
+      <p class="sub">Frequency-4 geodesic dome that drops over the 82.19 mm light ring and sits on the black base ring.</p>
+    </div>
+  </header>
+
+  <div class="grid">
+    <div style="display:grid; gap:14px; min-width:0">
+      <div class="stage" id="stage"><span class="hint">drag to orbit · scroll / pinch to zoom</span></div>
+      <div class="controls">
+        <div class="group" role="group" aria-label="Lighting">
+          <span class="label">Light</span>
+          <button class="seg" id="mode-studio" aria-pressed="true">Studio</button>
+          <button class="seg" id="mode-glow" aria-pressed="false">Lit</button>
+        </div>
+        <div class="group" role="group" aria-label="LED colour">
+          <span class="label">LED</span>
+          <button class="sw" id="led-warm" style="background:#ffd59a" aria-label="Warm white" aria-pressed="true"></button>
+          <button class="sw" id="led-blue" style="background:#3d6bff" aria-label="Blue" aria-pressed="false"></button>
+          <button class="sw" id="led-green" style="background:#2fe08a" aria-label="Green" aria-pressed="false"></button>
+          <button class="sw" id="led-magenta" style="background:#ff4fd2" aria-label="Magenta" aria-pressed="false"></button>
+        </div>
+        <div class="group" role="group" aria-label="View">
+          <span class="label">View</span>
+          <button class="seg" id="tog-section" aria-pressed="false">Section</button>
+          <button class="seg" id="tog-base" aria-pressed="true">Base ring</button>
+          <button class="seg" id="tog-spin" aria-pressed="true">Spin</button>
+        </div>
+      </div>
+    </div>
+
+    <aside>
+      <h2>Fit</h2>
+      <dl>
+        <dt>Light ring OD (measured)</dt><dd>82.19 mm</dd>
+        <dt>Shade bore (ID)</dt><dd>84.0 mm</dd>
+        <dt>Collar OD</dt><dd>90.6 mm</dd>
+        <dt>Collar wall / height</dt><dd>3.0 / 10 mm</dd>
+      </dl>
+      <h2>Size</h2>
+      <dl>
+        <dt>Overall height</dt><dd>100.6 mm (3.96 in)</dd>
+        <dt>Max diameter</dt><dd>116.0 mm</dd>
+        <dt>Sphere radius</dt><dd>58 mm</dd>
+        <dt>Panels</dt><dd>275 triangles</dd>
+        <dt>Panel thickness</dt><dd>0.8 mm</dd>
+        <dt>Strut width × depth</dt><dd>2.0 × 2.6 mm</dd>
+        <dt>Volume / PLA mass</dt><dd>52.8 cm³ · ~65 g</dd>
+      </dl>
+      <h2>Printing</h2>
+      <ul class="notes">
+        <li>Print upright, collar on the bed.</li>
+        <li>The upper cap is a shallow overhang on the inside. Enable tree supports, touching the build plate only. They come out through the 84 mm opening.</li>
+        <li>White or natural PLA/PETG. Use 0.4 mm nozzle and 0.2 mm layers, so each panel is exactly 2 perimeters.</li>
+      </ul>
+      <p class="files">cad/geodesic_shade.py<br>out/geodesic_shade.stl · .3mf · .step</p>
+    </aside>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/STLLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+const STL_B64 = "__STL_B64__";
+(function () {
+  const stage = document.getElementById('stage');
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.localClippingEnabled = true;
+  stage.appendChild(renderer.domElement);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(35, 1, 1, 2000);
+  camera.position.set(210, 150, 210);
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.target.set(0, 45, 0);
+  controls.enableDamping = true;
+  controls.minDistance = 120; controls.maxDistance = 600;
+
+  const hemi = new THREE.HemisphereLight(0xffffff, 0x445566, 0.75);
+  const key = new THREE.DirectionalLight(0xffffff, 0.8); key.position.set(150, 250, 120);
+  const rim = new THREE.DirectionalLight(0xffffff, 0.35); rim.position.set(-200, 80, -150);
+  const inner = new THREE.PointLight(0xffd59a, 0, 260, 1.4); inner.position.set(0, 18, 0);
+  scene.add(hemi, key, rim, inner);
+
+  // decode STL
+  const bin = atob(STL_B64); const buf = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+  const geom = new THREE.STLLoader().parse(buf.buffer);
+  geom.rotateX(-Math.PI / 2);   // CAD Z-up -> three Y-up
+  geom.computeVertexNormals();
+
+  const clip = new THREE.Plane(new THREE.Vector3(0, 0, -1), 0);
+  const mat = new THREE.MeshStandardMaterial({ color: 0xf3efe6, roughness: 0.75, metalness: 0, side: THREE.DoubleSide, clippingPlanes: [] });
+  const shade = new THREE.Mesh(geom, mat);
+  scene.add(shade);
+
+  // reference: black base ring + chrome light ring (approximate, from photo)
+  const base = new THREE.Group();
+  const black = new THREE.Mesh(new THREE.CylinderGeometry(66, 66, 4, 96),
+    new THREE.MeshStandardMaterial({ color: 0x15171a, roughness: 0.35 }));
+  black.position.y = -2;
+  const chrome = new THREE.Mesh(new THREE.CylinderGeometry(41.1, 41.1, 9, 96, 1, true),
+    new THREE.MeshStandardMaterial({ color: 0xb9c2cc, metalness: 0.9, roughness: 0.25, side: THREE.DoubleSide }));
+  chrome.position.y = 4.5;
+  const lens = new THREE.Mesh(new THREE.SphereGeometry(38, 48, 24, 0, Math.PI * 2, 0, Math.PI / 2.3),
+    new THREE.MeshStandardMaterial({ color: 0xffd59a, emissive: 0x000000, transparent: true, opacity: 0.55, roughness: 0.1 }));
+  lens.scale.y = 0.55; lens.position.y = 6;
+  base.add(black, chrome, lens);
+  scene.add(base);
+
+  let glow = false, led = 0xffd59a, spin = true;
+  function applyLight() {
+    if (glow) {
+      // Approximation of backlit panels: emissive tint, dim ambient, LED point light inside.
+      mat.emissive.setHex(led); mat.emissiveIntensity = 0.55;
+      mat.color.setHex(0x8a8a8a);
+      hemi.intensity = 0.15; key.intensity = 0.15; rim.intensity = 0.1;
+      inner.color.setHex(led); inner.intensity = 2.2;
+      lens.material.emissive.setHex(led); lens.material.color.setHex(led);
+    } else {
+      mat.emissive.setHex(0x000000); mat.color.setHex(0xf3efe6);
+      hemi.intensity = 0.75; key.intensity = 0.8; rim.intensity = 0.35; inner.intensity = 0;
+      lens.material.emissive.setHex(0x000000); lens.material.color.setHex(0xdde4ec);
+    }
+  }
+  applyLight();
+
+  function press(id, on) { document.getElementById(id).setAttribute('aria-pressed', String(on)); }
+  document.getElementById('mode-studio').onclick = () => { glow = false; press('mode-studio', true); press('mode-glow', false); applyLight(); };
+  document.getElementById('mode-glow').onclick = () => { glow = true; press('mode-studio', false); press('mode-glow', true); applyLight(); };
+  const leds = { 'led-warm': 0xffd59a, 'led-blue': 0x3d6bff, 'led-green': 0x2fe08a, 'led-magenta': 0xff4fd2 };
+  Object.keys(leds).forEach(id => document.getElementById(id).onclick = () => {
+    led = leds[id]; Object.keys(leds).forEach(o => press(o, o === id));
+    if (!glow) { glow = true; press('mode-studio', false); press('mode-glow', true); }
+    applyLight();
+  });
+  document.getElementById('tog-section').onclick = (e) => {
+    const on = e.currentTarget.getAttribute('aria-pressed') !== 'true'; press('tog-section', on);
+    mat.clippingPlanes = on ? [clip] : []; mat.needsUpdate = true;
+  };
+  document.getElementById('tog-base').onclick = (e) => {
+    const on = e.currentTarget.getAttribute('aria-pressed') !== 'true'; press('tog-base', on); base.visible = on;
+  };
+  document.getElementById('tog-spin').onclick = (e) => {
+    spin = e.currentTarget.getAttribute('aria-pressed') !== 'true'; press('tog-spin', spin);
+  };
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { spin = false; press('tog-spin', false); }
+  controls.addEventListener('start', () => { spin = false; press('tog-spin', false); });
+
+  function resize() {
+    const w = stage.clientWidth, h = stage.clientHeight;
+    renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
+  }
+  new ResizeObserver(resize).observe(stage); resize();
+
+  (function loop() {
+    if (spin) shade.rotation.y += 0.003;
+    controls.update(); renderer.render(scene, camera); requestAnimationFrame(loop);
+  })();
+})();
+</script>

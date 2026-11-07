@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+
+# OS / editors
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.idea/
+.vscode/
+
+# Claude Code local settings (shared settings in .claude/settings.json stay tracked)
+.claude/settings.local.json
+
+# Scratch renders and exports (the committed models live in out/)
+out/renders/
+out/tmp/
+*.log
+
+# Slicer project files and G-code are printer-specific
+*.gcode
+*.bgcode
+*.gcode.3mf
