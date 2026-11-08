@@ -67,10 +67,31 @@ lip included, is a single 1.2 mm layer, so the whole pipe glows evenly. The open
 | Material | 50.9 cm³, about 63 g PLA. Use translucent or light green. |
 | Supports | None when printed rim-down; add a brim. `out/pipe_shade_print.stl` and the 3MF are already flipped. |
 
+### Scooter cylinder
+
+<img src="images/scooter_cylinder.png" alt="Scooter cylinder shade, lit" width="360">
+
+A 6-inch tube with scooters, helmets, a wheel and scattered dots, from
+[`patterns/scooter.svg`](patterns/scooter.svg). The shapes are pockets cut 1 mm deep into the
+inside of a thin wall. They glow brightest, and the rest of the wall still lets light through.
+The scooters, helmets and wheel are wrapped exactly onto the cylinder. The dots are short
+radial prisms, trimmed to the skin.
+
+- **Viewer:** [`out/scooter_cylinder_viewer.html`](out/scooter_cylinder_viewer.html)
+  ([shared copy](https://claude.ai/artifact/Q5ZwhQaycchANr8zsXTM4D))
+
+| | |
+|---|---|
+| Height × diameter | 152.4 × 87.6 mm (6.00 in tall), 84.0 mm bore |
+| Wall thickness | 0.8 mm skin under the shapes (bright), 1.8 mm wall elsewhere (soft glow) |
+| Pattern | 151 shapes, with 3 mm solid bands at top and bottom. The wrap is stretched 13% around the circumference so the seam closes. |
+| Material | 65.2 cm³, about 81 g PLA |
+| Supports | None; use a brim. Each pocket ceiling overhangs 1 mm at most. |
+
 ## Printing
 
-- Print the dome and pixel cylinder upright with the collar on the bed. Print the pipe upside down, rim on the bed.
-- Use a 0.4 mm nozzle. Print the dome and cylinder in white or natural PLA. Their 0.8 mm skins are exactly two perimeters, so don't add extra walls.
+- Print the dome and both patterned cylinders upright with the collar on the bed. Print the pipe upside down, rim on the bed.
+- Use a 0.4 mm nozzle. Print the dome and cylinders in white or natural PLA. Their 0.8 mm skins are exactly two perimeters, so don't add extra walls.
 
 ## Repository layout
 
@@ -79,9 +100,11 @@ cad/
   geodesic_shade.py     geodesic dome model
   pixel_cylinder.py     arcade pixel cylinder model (reads patterns/arcade_pixels.svg)
   pipe_shade.py         green pipe model
+  scooter_cylinder.py   scooter cylinder model (reads patterns/scooter.svg)
   build_viewer.py       embeds each STL (and the pixel pattern) into its viewer page
 patterns/
-  arcade_pixels.svg     pixel pattern for the cylinder (90 x 57 grid, inches)
+  arcade_pixels.svg     pixel pattern for the pixel cylinder (90 x 57 grid, inches)
+  scooter.svg           silhouette pattern for the scooter cylinder
 images/
   *.png                 README renders, captured from the viewer pages
 web/
@@ -97,6 +120,7 @@ out/
 uv run --python 3.12 --with build123d python cad/geodesic_shade.py
 uv run --python 3.12 --with build123d python cad/pixel_cylinder.py
 uv run --python 3.12 --with build123d python cad/pipe_shade.py
+uv run --python 3.12 --with build123d python cad/scooter_cylinder.py   # ~15 s
 python3 cad/build_viewer.py
 ```
 

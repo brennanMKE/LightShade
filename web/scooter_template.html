@@ -1,0 +1,262 @@
+<title>Scooter Night Shade</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: viewer stage on the left, spec sheet on the right; stacks on phones */
+:root {
+  --bg: #f3eee6; --panel: #fffdf9; --fg: #241a10; --muted: #6b5c4b; --line: #e0d6c7;
+  --accent: #b86a00; --stage: #0e0b08;
+  --t-thin: #ffb43c; --t-mid: #8a5a22;
+  --display: "Fraunces", Georgia, serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #120d09; --panel: #1b140e; --fg: #f1e7da; --muted: #a8977f; --line: #33271b;
+  --accent: #ffb43c; --stage: #0a0806; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #120d09; --panel: #1b140e; --fg: #f1e7da; --muted: #a8977f; --line: #33271b;
+  --accent: #ffb43c; --stage: #0a0806; color-scheme: dark }
+body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 15px; line-height: 1.5; }
+.wrap { max-width: 1200px; margin: 0 auto; padding-block: 24px 40px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 20px; }
+h1 { font-family: var(--display); font-weight: 600; font-size: clamp(24px, 4vw, 36px); margin: 0; letter-spacing: .02em; text-wrap: balance; }
+.sub { color: var(--muted); margin: 0; max-width: 70ch; }
+.grid { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 20px; align-items: start; }
+@media (max-width: 860px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+.stage { position: relative; background: var(--stage); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; aspect-ratio: 4 / 3.6; max-width: 100%; }
+.stage canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+.hint { position: absolute; left: 12px; bottom: 10px; font: 12px var(--mono); color: #8a7a66; pointer-events: none; }
+.controls { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: center; }
+.group { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.label { font: 500 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-right: 4px; }
+button.seg { font: 500 13px var(--body); color: var(--fg); background: var(--panel); border: 1px solid var(--line); padding: 6px 12px; border-radius: 6px; cursor: pointer; }
+button.seg[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+button.sw { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--line); cursor: pointer; padding: 0; }
+button.sw[aria-pressed="true"] { border-color: var(--fg); }
+button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+aside { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 18px 18px 8px; min-width: 0; }
+aside h2 { font: 600 15px var(--display); letter-spacing: .02em; margin: 0 0 10px; }
+dl { display: grid; grid-template-columns: 1fr auto; gap: 7px 12px; margin: 0 0 18px; }
+dt { color: var(--muted); }
+dd { margin: 0; font-family: var(--mono); font-variant-numeric: tabular-nums; text-align: right; }
+.tones { display: grid; gap: 8px; margin: 0 0 18px; padding: 0; list-style: none; }
+.tones li { display: grid; grid-template-columns: 22px 1fr auto; gap: 10px; align-items: center; }
+.chip { width: 22px; height: 22px; border-radius: 4px; border: 1px solid var(--line); }
+.tones .mm { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.notes { margin: 0 0 14px; padding-left: 18px; }
+.notes li { margin-bottom: 6px; }
+code { font-family: var(--mono); font-size: 13px; }
+.files { font-family: var(--mono); font-size: 12.5px; color: var(--muted); word-break: break-all; }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Scooter Night Shade</h1>
+    <p class="sub">A 6-inch cylinder for the 82.19 mm light ring. Scooters, helmets, a wheel and scattered dots are cut into the inside of a thin 1.8 mm wall. The shapes glow brightest through a 0.8 mm skin, and the rest of the wall still glows softly.</p>
+  </header>
+
+  <div class="grid">
+    <div style="display:grid; gap:14px; min-width:0">
+      <div class="stage" id="stage"><span class="hint">drag to orbit · scroll / pinch to zoom</span></div>
+      <div class="controls">
+        <div class="group" role="group" aria-label="Lighting">
+          <span class="label">Light</span>
+          <button class="seg" id="mode-studio" aria-pressed="false">Studio</button>
+          <button class="seg" id="mode-glow" aria-pressed="true">Lit</button>
+        </div>
+        <div class="group" role="group" aria-label="LED colour">
+          <span class="label">LED</span>
+          <button class="sw" id="led-amber" style="background:#ffc27a" aria-label="Warm" aria-pressed="true"></button>
+          <button class="sw" id="led-white" style="background:#fff4e0" aria-label="Warm white" aria-pressed="false"></button>
+          <button class="sw" id="led-blue" style="background:#3d6bff" aria-label="Blue" aria-pressed="false"></button>
+          <button class="sw" id="led-green" style="background:#2fe08a" aria-label="Green" aria-pressed="false"></button>
+          <button class="sw" id="led-magenta" style="background:#ff4fd2" aria-label="Magenta" aria-pressed="false"></button>
+        </div>
+        <div class="group" role="group" aria-label="View">
+          <span class="label">View</span>
+          <button class="seg" id="tog-section" aria-pressed="false">Section</button>
+          <button class="seg" id="tog-base" aria-pressed="true">Base ring</button>
+          <button class="seg" id="tog-spin" aria-pressed="true">Spin</button>
+        </div>
+      </div>
+    </div>
+
+    <aside>
+      <h2>Light levels</h2>
+      <ul class="tones">
+        <li><span class="chip" style="background:var(--t-thin)"></span><span>Shapes</span><span class="mm">0.8 mm</span></li>
+        <li><span class="chip" style="background:var(--t-mid)"></span><span>Wall</span><span class="mm">1.8 mm</span></li>
+      </ul>
+      <h2>Fit</h2>
+      <dl>
+        <dt>Light ring OD (measured)</dt><dd>82.19 mm</dd>
+        <dt>Shade bore (ID)</dt><dd>84.0 mm</dd>
+        <dt>Outside diameter</dt><dd>87.6 mm</dd>
+      </dl>
+      <h2>Pattern</h2>
+      <dl>
+        <dt>Source</dt><dd>scooter.svg</dd>
+        <dt>Shapes cut</dt><dd>151</dd>
+        <dt>Pocket depth</dt><dd>1.0 mm</dd>
+        <dt>Solid band top / bottom</dt><dd>3 mm</dd>
+        <dt>Horizontal stretch</dt><dd>13%</dd>
+      </dl>
+      <h2>Size</h2>
+      <dl>
+        <dt>Height</dt><dd>152.4 mm (6.00 in)</dd>
+        <dt>Volume / PLA mass</dt><dd>65.2 cm³ · ~81 g</dd>
+      </dl>
+      <h2>Printing</h2>
+      <ul class="notes">
+        <li>Print upright with a brim, and no supports. The pockets are only 1 mm deep, so each ceiling overhangs by 1 mm at most.</li>
+        <li>Use white or natural PLA with a 0.4 mm nozzle. The 0.8 mm skin is exactly two perimeters.</li>
+        <li>The wrap is stretched around the 87.6 mm shade, wider than the 3-inch cardstock tube it was drawn for. Shapes come out about 13% wider than drawn.</li>
+      </ul>
+      <p class="files">patterns/scooter.svg<br>cad/scooter_cylinder.py<br>out/scooter_cylinder.stl · .3mf · .step</p>
+    </aside>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/STLLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+const STL_B64 = "__STL_B64__";
+const SHAPES_SVG = "__SVG_DATA__";   // patterns/scooter.svg, filled, as base64
+const WRAP_IN = 9.425, SVG_W_IN = 9.675, SVG_H_IN = 6.0, R_OUT = 43.8, HEIGHT = 152.4;
+const WALL_GLOW = 0.38;              // 1.8 mm wall vs 0.8 mm skin
+(function () {
+  const stage = document.getElementById('stage');
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.localClippingEnabled = true;
+  stage.appendChild(renderer.domElement);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(35, 1, 1, 2000);
+  camera.position.set(260, 150, 260);
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.target.set(0, 72, 0);
+  controls.enableDamping = true;
+  controls.minDistance = 140; controls.maxDistance = 700;
+
+  const hemi = new THREE.HemisphereLight(0xffffff, 0x554433, 0.75);
+  const key = new THREE.DirectionalLight(0xffffff, 0.8); key.position.set(150, 250, 120);
+  const rim = new THREE.DirectionalLight(0xffffff, 0.35); rim.position.set(-200, 80, -150);
+  scene.add(hemi, key, rim);
+
+  const bin = atob(STL_B64); const buf = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+  const geom = new THREE.STLLoader().parse(buf.buffer);
+  geom.rotateX(-Math.PI / 2);          // CAD Z-up -> three Y-up
+  geom.computeVertexNormals();
+
+  const clip = new THREE.Plane(new THREE.Vector3(0, 0, -1), 0);
+  const studioMat = new THREE.MeshStandardMaterial({ color: 0xf3efe6, roughness: 0.75, side: THREE.DoubleSide });
+  const innerMat = new THREE.MeshBasicMaterial({ color: 0x6b4314, side: THREE.DoubleSide });
+  const shade = new THREE.Mesh(geom, studioMat);
+
+  // Glow skin: the SVG pixels painted onto a cylinder just outside the printed surface.
+  // CAD angle theta maps to three's cylinder u as u = (theta + 90deg) / 360deg.
+  const tex = document.createElement('canvas');
+  tex.width = 4096; tex.height = Math.round(4096 * HEIGHT / (2 * Math.PI * R_OUT));
+  const ctx = tex.getContext('2d');
+  const texture = new THREE.CanvasTexture(tex);
+  texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+  // Shapes come from the SVG drawn as an image, then tinted to the LED colour.
+  const art = new Image();
+  const shapeLayer = document.createElement('canvas');
+  shapeLayer.width = tex.width; shapeLayer.height = tex.height;
+  art.onload = () => {
+    const g = shapeLayer.getContext('2d');
+    const W = tex.width, H = tex.height;
+    const drawW = W * SVG_W_IN / WRAP_IN;            // the wrap fills the circumference; the tab hangs off
+    const offset = W * 0.25;                          // CAD theta 0 sits at u = 0.25
+    for (const dx of [-W, 0, W]) g.drawImage(art, offset + dx, 0, drawW, H);
+    // anything beyond the wrap width (the glue tab) is under the overlap, so clear it
+    applyLight();
+  };
+  art.src = 'data:image/svg+xml;base64,' + SHAPES_SVG;
+  function paint(hex) {
+    const c = new THREE.Color(hex);
+    const css = (k) => `rgb(${Math.round(c.r * 255 * k)},${Math.round(c.g * 255 * k)},${Math.round(c.b * 255 * k)})`;
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = css(WALL_GLOW); ctx.fillRect(0, 0, tex.width, tex.height);
+    // tinted copy of the shapes with a soft halo
+    const tint = document.createElement('canvas');
+    tint.width = tex.width; tint.height = tex.height;
+    const t = tint.getContext('2d');
+    t.drawImage(shapeLayer, 0, 0);
+    t.globalCompositeOperation = 'source-in';
+    t.fillStyle = css(1); t.fillRect(0, 0, tint.width, tint.height);
+    ctx.shadowColor = css(1); ctx.shadowBlur = 18;
+    ctx.drawImage(tint, 0, 0);
+    ctx.shadowBlur = 0;
+    texture.needsUpdate = true;
+  }
+  const skinMat = new THREE.MeshBasicMaterial({ map: texture, side: THREE.FrontSide });
+  const skin = new THREE.Mesh(new THREE.CylinderGeometry(R_OUT + 0.05, R_OUT + 0.05, HEIGHT, 256, 1, true), skinMat);
+  skin.position.y = HEIGHT / 2;
+
+  const spinner = new THREE.Group();
+  spinner.add(shade, skin);
+  scene.add(spinner);
+
+  const base = new THREE.Group();
+  const black = new THREE.Mesh(new THREE.CylinderGeometry(66, 66, 4, 96),
+    new THREE.MeshStandardMaterial({ color: 0x15171a, roughness: 0.35 }));
+  black.position.y = -2;
+  const chrome = new THREE.Mesh(new THREE.CylinderGeometry(41.1, 41.1, 9, 96, 1, true),
+    new THREE.MeshStandardMaterial({ color: 0xb9c2cc, metalness: 0.9, roughness: 0.25, side: THREE.DoubleSide }));
+  chrome.position.y = 4.5;
+  base.add(black, chrome);
+  scene.add(base);
+
+  let glow = true, spin = true, led = 0xffc27a;
+  function applyLight() {
+    paint(led);
+    skin.visible = glow;
+    shade.material = glow ? innerMat : studioMat;
+    innerMat.color.set(new THREE.Color(led).multiplyScalar(0.45));
+    hemi.intensity = glow ? 0.15 : 0.75;
+  }
+  applyLight();
+
+  function press(id, on) { document.getElementById(id).setAttribute('aria-pressed', String(on)); }
+  document.getElementById('mode-studio').onclick = () => { glow = false; press('mode-studio', true); press('mode-glow', false); applyLight(); };
+  document.getElementById('mode-glow').onclick = () => { glow = true; press('mode-studio', false); press('mode-glow', true); applyLight(); };
+  const leds = { 'led-amber': 0xffc27a, 'led-white': 0xfff4e0, 'led-blue': 0x5a82ff, 'led-green': 0x2fe08a, 'led-magenta': 0xff4fd2 };
+  Object.keys(leds).forEach(id => document.getElementById(id).onclick = () => {
+    led = leds[id]; Object.keys(leds).forEach(o => press(o, o === id));
+    if (!glow) { glow = true; press('mode-studio', false); press('mode-glow', true); }
+    applyLight();
+  });
+  document.getElementById('tog-section').onclick = (e) => {
+    const on = e.currentTarget.getAttribute('aria-pressed') !== 'true'; press('tog-section', on);
+    [studioMat, innerMat, skinMat].forEach(m => { m.clippingPlanes = on ? [clip] : []; m.needsUpdate = true; });
+  };
+  document.getElementById('tog-base').onclick = (e) => {
+    const on = e.currentTarget.getAttribute('aria-pressed') !== 'true'; press('tog-base', on); base.visible = on;
+  };
+  document.getElementById('tog-spin').onclick = (e) => {
+    spin = e.currentTarget.getAttribute('aria-pressed') !== 'true'; press('tog-spin', spin);
+  };
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { spin = false; press('tog-spin', false); }
+  controls.addEventListener('start', () => { spin = false; press('tog-spin', false); });
+
+  function resize() {
+    const w = stage.clientWidth, h = stage.clientHeight;
+    renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
+  }
+  new ResizeObserver(resize).observe(stage); resize();
+
+  (function loop() {
+    if (spin) spinner.rotation.y += 0.003;
+    controls.update(); renderer.render(scene, camera); requestAnimationFrame(loop);
+  })();
+})();
+</script>
